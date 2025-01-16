@@ -1,0 +1,55 @@
+Once you've identified the errors, you can clean the data by updating the records. Below is an example of how to clean the data in SQL.
+
+Example SQL for Cleaning:
+1.	Fixing NULL values: You can set default values or update the rows that have missing values.
+2.	Correcting invalid age: Set ages that are invalid to a reasonable default, e.g., 25.
+3.	Fixing invalid emails: You could flag records for manual review, or if you have a valid email pattern, update the incorrect ones.
+
+-- Update missing user_name with default value
+UPDATE user_data
+SET user_name = 'Unknown'
+WHERE user_name IS NULL;
+
+-- Update missing email with a default value
+UPDATE user_data
+SET email = 'noemail@example.com'
+WHERE email IS NULL;
+
+-- Update invalid age (less than 1 or greater than 120) to 25
+UPDATE user_data
+SET age = 25
+WHERE age <= 0 OR age > 120;
+
+-- Update invalid email format with a placeholder email
+UPDATE user_data
+SET email = 'invalid_email@placeholder.com'
+WHERE email NOT LIKE '%_@__%.__%';
+
+-- Correct future join_date to the current date
+UPDATE user_data
+SET join_date = CURDATE()
+WHERE join_date > CURDATE();
+
+/*
+Automating the Process (SQL Server Example)
+For SQL Server, instead of using INTO OUTFILE, you can use PowerShell or Python to execute SQL queries, capture the result, and export it to a .txt file.
+*/
+
+Here’s an example in PowerShell:
+# Connect to SQL Server
+$serverName = "your_server_name"
+$databaseName = "your_database_name"
+$query = "SELECT user_id, user_name, email, age, join_date, 
+                 CASE 
+                     WHEN user_name IS NULL THEN 'Missing user_name'
+                     WHEN email IS NULL THEN 'Missing email'
+                     WHEN age <= 0 OR age > 120 THEN 'Invalid age'
+                     WHEN email NOT LIKE '%_@__%.__%' THEN 'Invalid email format'
+                     WHEN join_date > GETDATE() THEN 'Join date is in the future'
+                     ELSE 'No error'
+                 END AS error_type
+          FROM user_data
+          WHERE user_name IS NULL OR email IS NULL OR age <= 0 OR age > 120 OR email NOT LIKE '%_@__%.__%' OR join_date > GETDATE();"
+
+# Run query and export to file
+Invoke-Sqlcmd -ServerInstance $serverName -Database $databaseName -Query $query | Out-File "C:\path_to_file\user_data_errors.txt"
