@@ -1,0 +1,7 @@
+This approach covers:
+•	Identifying data errors in SQL.
+•	Exporting those errors to a notepad or text file.
+•	Cleaning the data with automatic fixes.
+
+You'll need to adjust the paths and query details based on your specific environment and use case. If you have a more complex set of rules 
+or need more flexibility, you can integrate this process into a larger ETL (Extract, Transform, Load) framework or use a more advanced scripting language.
