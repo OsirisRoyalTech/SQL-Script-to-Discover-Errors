@@ -1,0 +1,43 @@
+Here’s how we can identify potential data issues in a table:
+
+-- Example Table: user_data
+CREATE TABLE user_data (
+    user_id INT PRIMARY KEY,
+    user_name VARCHAR(255),
+    email VARCHAR(255),
+    age INT,
+    join_date DATE
+);
+
+/*
+Error Discovery:
+  Common data errors might include:
+  •	NULL values where they shouldn’t be (e.g., user_name, email).
+  •	Invalid email format.
+  •	age outside of a reasonable range (e.g., 0 or negative).
+  •	join_date in the future.
+*/
+
+-- SQL Query for Error Detection:
+SELECT user_id,
+       user_name,
+       email,
+       age,
+       join_date,
+       CASE
+           WHEN user_name IS NULL THEN 'Missing user_name'
+           WHEN email IS NULL THEN 'Missing email'
+           WHEN age <= 0 OR age > 120 THEN 'Invalid age'
+           WHEN email NOT LIKE '%_@__%.__%' THEN 'Invalid email format'
+           WHEN join_date > CURDATE() THEN 'Join date is in the future'
+           ELSE 'No error'
+       END AS error_type
+FROM user_data
+WHERE user_name IS NULL
+   OR email IS NULL
+   OR age <= 0
+   OR age > 120
+   OR email NOT LIKE '%_@__%.__%'
+   OR join_date > CURDATE();
+
+-- This query will return a list of records with detected errors.
